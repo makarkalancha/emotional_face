@@ -66,4 +66,12 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+
+//    implementation("com.android.support:appcompat-v7:27.0.2")
+//    testImplementation("junit:junit:4.12")
+//    androidTestImplementation("com.android.support.test.espresso:espresso-core:3.0.1", {
+//        exclude group: "com.android.support", module: "support-annotations"
+//    })
+//    implementation("org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version")
 }
