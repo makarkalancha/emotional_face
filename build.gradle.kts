@@ -8,8 +8,8 @@ buildscript {
     repositories {
         google()
     }
-    dependencies {
-        val kotlin_version = "1.2.21"
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
-    }
+//    dependencies {
+//        val kotlin_version = "1.2.21"
+//        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+//    }
 }
