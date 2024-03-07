@@ -6,6 +6,8 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
+import android.os.Bundle
+import android.os.Parcelable
 import android.util.AttributeSet
 import android.view.View
 
@@ -113,5 +115,27 @@ class EmotionalFaceView (context: Context, attrs: AttributeSet): View (context, 
         size = Math.min(measuredWidth, measuredHeight)
 
         setMeasuredDimension(size, size)
+    }
+
+    override fun onSaveInstanceState(): Parcelable? {
+        val bundle = Bundle()
+
+        //Put the happiness state value into the bundle.
+        bundle.putLong("hapinessState", happinessState)
+        //Put the state coming from the superclass, in order to not lose any data saved by the superclass, then return the bundle
+        bundle.putParcelable("superState", super.onSaveInstanceState())
+        return bundle
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        var viewState = state
+        //Check the type of the Parcelable to cast it to a Bundle object.
+        if(viewState is Bundle){
+            //Get the happinessState value.
+            happinessState = viewState.getLong("hapinessState", HAPPY)
+            //Get the superstate then pass it to the super method.
+            viewState = viewState.getParcelable("superState")
+        }
+        super.onRestoreInstanceState(viewState)
     }
 }
