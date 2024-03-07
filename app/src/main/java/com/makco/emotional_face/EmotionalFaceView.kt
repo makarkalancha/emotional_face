@@ -10,18 +10,50 @@ import android.util.AttributeSet
 import android.view.View
 
 class EmotionalFaceView (context: Context, attrs: AttributeSet): View (context, attrs) {
-    private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    companion object{
+        private const val DEFAULT_FACE_COLOR = Color.YELLOW
+        private const val DEFAULT_EYES_COLOR = Color.BLACK
+        private const val DEFAULT_MOUTH_COLOR = Color.BLACK
+        private const val DEFAULT_BORDER_COLOR = Color.BLACK
+        private const val DEFAULT_BORDER_WIDTH = 4.0f
 
-    private val FACE_COLOR = Color.YELLOW
-    private val EYES_COLOR = Color.BLACK
-    private val MOUTH_COLOR = Color.BLACK
-    private val BORDER_COLOR = Color.BLACK
+        const val HAPPY = 0L
+        const val SAD = 1L
+    }
 
-    private var borderWidth = 4.0f
+    private var faceColor = DEFAULT_FACE_COLOR
+    private var eyesColor = DEFAULT_EYES_COLOR
+    private var mouthColor = DEFAULT_MOUTH_COLOR
+    private var borderColor = DEFAULT_BORDER_COLOR
+    private var borderWidth = DEFAULT_BORDER_WIDTH
 
-    private var size = 320
-
+    private val paint = Paint()
     private val mouthPath = Path()
+    private var size = 0
+
+    var happinessState = HAPPY
+        set(state){
+            field = state
+            invalidate()
+        }
+
+    init {
+        paint.isAntiAlias = true
+        setupAttributes(attrs)
+    }
+
+    private fun setupAttributes(attrs: AttributeSet?){
+        val typedArray = context.theme.obtainStyledAttributes(attrs, R.styleable.EmotionalFaceView, 0, 0)
+
+        happinessState = typedArray.getInt(R.styleable.EmotionalFaceView_state, HAPPY.toInt()).toLong()
+        faceColor = typedArray.getColor(R.styleable.EmotionalFaceView_faceColor, DEFAULT_FACE_COLOR)
+        eyesColor = typedArray.getColor(R.styleable.EmotionalFaceView_eyesColor, DEFAULT_EYES_COLOR)
+        mouthColor = typedArray.getColor(R.styleable.EmotionalFaceView_mouthColor, DEFAULT_MOUTH_COLOR)
+        borderColor = typedArray.getColor(R.styleable.EmotionalFaceView_borderColor, DEFAULT_BORDER_COLOR)
+        borderWidth = typedArray.getDimension(R.styleable.EmotionalFaceView_borderWidth, DEFAULT_BORDER_WIDTH)
+
+        typedArray.recycle()
+    }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
@@ -32,14 +64,14 @@ class EmotionalFaceView (context: Context, attrs: AttributeSet): View (context, 
     }
 
     private fun drawFaceBackground(canvas: Canvas){
-        paint.color = FACE_COLOR
+        paint.color = faceColor
         paint.style = Paint.Style.FILL
 
         val radius = size / 2f
 
         canvas.drawCircle(size / 2f, size / 2f, radius, paint)
 
-        paint.color = BORDER_COLOR
+        paint.color = borderColor
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = borderWidth
 
@@ -47,7 +79,7 @@ class EmotionalFaceView (context: Context, attrs: AttributeSet): View (context, 
     }
 
     private fun drawEyes(canvas: Canvas){
-        paint.color = EYES_COLOR
+        paint.color = eyesColor
         paint.style = Paint.Style.FILL
 
         val leftEyeRect = RectF(size * 0.32f, size * 0.23f, size * 0.43f, size * 0.50f)
@@ -58,13 +90,28 @@ class EmotionalFaceView (context: Context, attrs: AttributeSet): View (context, 
     }
 
     private fun drawMouth(canvas: Canvas){
-        mouthPath.moveTo(size * 0.22f, size * 0.7f)
-        mouthPath.quadTo(size * 0.50f, size * 0.80f, size * 0.78f, size * 0.70f)
-        mouthPath.quadTo(size * 0.50f, size * 0.90f, size * 0.22f, size * 0.70f)
+        mouthPath.reset()
 
-        paint.color = MOUTH_COLOR
+        mouthPath.moveTo(size * 0.22f, size * 0.7f)
+
+        if(happinessState == HAPPY){
+            mouthPath.quadTo(size * 0.5f, size * 0.8f, size * 0.78f, size * 0.7f)
+            mouthPath.quadTo(size * 0.5f, size * 0.9f, size * 0.22f, size * 0.7f)
+        }else{
+            mouthPath.quadTo(size * 0.5f, size * 0.5f, size * 0.78f, size * 0.7f)
+            mouthPath.quadTo(size * 0.5f, size * 0.6f, size * 0.22f, size * 0.7f)
+        }
+
+        paint.color = mouthColor
         paint.style = Paint.Style.FILL
 
         canvas.drawPath(mouthPath, paint)
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        size = Math.min(measuredWidth, measuredHeight)
+
+        setMeasuredDimension(size, size)
     }
 }
